@@ -1,0 +1,90 @@
+<!-- templates/inventory/create_income.html -->
+{% extends 'base_dashboard.html' %}
+
+{% load form_tags %}  <!-- Carga los filtros personalizados -->
+
+{% block title %}Ingreso{% endblock %}
+
+{% block content %}
+  <h2 class="title is-4">Ingreso de Material a Depósito</h2>
+
+  <!-- Formulario de búsqueda de producto -->
+  <form method="get" action="{% url 'create_income' %}" class="box">
+    <div class="field">
+      <label class="label">Buscar Producto</label>
+      <div class="control">
+        <input class="input" type="text" name="search_query" placeholder="Buscar por nombre, modelo o número de serie" value="{{ search_query }}">
+      </div>
+    </div>
+    <div class="control">
+      <button type="submit" class="button is-info">Buscar</button>
+    </div>
+  </form>
+
+  <!-- Mostrar resultados de la búsqueda -->
+  {% if products %}
+    <h5 class="title is-5">Resultados de la búsqueda:</h5>
+    <ul>
+      {% for product in products %}
+        <li>
+          <a href="?product_id={{ product.id }}">
+            {{ product.name }} ( {{ product.brand.name }} ) - Mod: {{ product.model }} - SN: {{ product.serial_number}}
+          </a>
+        </li>
+      {% empty %}
+        <li>No se encontraron productos.</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+
+  <!-- Formulario de ingreso -->
+  {% if selected_product %}
+    <!--<h5 class="title is-5">Seleccionado: {{ selected_product.name }} - {{ selected_product.brand.name}}</h5>-->
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="field">
+        <label class="label">Producto seleccionado</label>
+        <div class="control">
+          <!-- {{ form.product|add_class:"input" }} -->
+          <input
+            class="input"
+            type="text"
+            value="{{ selected_product.name }} ( {{ selected_product.brand.name}} ) - Mod: {{ selected_product.model}} - SN: {{ selected_product.serial_number}}" disabled>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Cantidad</label>
+        <div class="control">
+          {{ form.quantity|add_class:"input" }}
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Ubicación</label>
+        <div class="control">
+          {{ form.location|add_class:"input" }}
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Remito (Opcional)</label>
+        <div class="control">
+          {{ form.delivery_order|add_class:"input" }}
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Comentario (Opcional)</label>
+        <div class="control">
+          {{ form.comment|add_class:"textarea" }}
+        </div>
+      </div>
+
+      <div class="control">
+        <button type="submit" class="button is-primary">Registrar Ingreso</button>
+      </div>
+    </form>
+  {% endif%}
+{% endblock %}

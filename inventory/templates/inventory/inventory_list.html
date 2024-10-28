@@ -1,0 +1,156 @@
+<!-- templates/inventory/inventory_list.html -->
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Consulta de Inventario{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+  <h2 class="title is-4">Consulta de Inventario</h2>
+</div>
+
+<!-- Formulario de búsqueda -->
+<form method="get" action="{% url 'inventory_list' %}" class="box is-mobile">
+    <div class="columns is-mobile">
+
+        <div class="column is-narrow">
+            <label class="label">Nombre del Producto</label>
+            <input class="input" type="text" name="product_name" value="{{ request.GET.product_name }}" style="max-width: 150px;">
+        </div>
+
+        <div class="column is-narrow">
+            <label class="label">Marca</label>
+            <div class="select">
+                <select name="brand">
+                    <option value="">Todas las marcas</option>
+                    {% for brand in brands %}
+                        <option value="{{ brand.id }}" {% if request.GET.brand == brand.id|stringformat:"s" %}selected{% endif %}>
+                        {{ brand.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="column is-narrow">
+            <label class="label">Ubicación</label>
+            <div class="select">
+                <select name="location">
+                    <option value="">Todas las ubicaciones</option>
+                    {% for location in locations %}
+                        <option value="{{ location.id }}" {% if request.GET.location == location.id|stringformat:"s" %}selected{% endif %}>
+                        {{ location.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="column">
+            <label class="label">Categoría</label>
+            <div class="select">
+                <select name="category">
+                  <option value="">Todas las categorías</option>
+                  {% for category in categories %}
+                  <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>
+                  {{ category.name }}
+                  </option>
+                  {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="column is-narrow is-text-right">
+            <label class="label">Cant.Mín</label>
+            <input class="input" type="number" name="min_quantity" value="{{ request.GET.min_quantity }}" style="max-width: 80px;">
+        </div>
+
+        <div class="column is-narrow is-text-right">
+            <label class="label">Cant.Máx</label>
+            <input class="input" type="number" name="max_quantity" value="{{ request.GET.max_quantity }}" style="max-width: 80px;">
+        </div>
+    </div>
+
+    <div class="columns is-mobile">
+
+        <div class="column">
+            <div class="control">
+                <button type="submit" class="button is-primary">Consultar</button>
+            </div>
+        </div>
+
+        <div class="column is-narrow is-text-right">
+            <div class="control">
+                <a class="button is-success is-warning mx-2" href="/inventory/inventory">Limpiar filtros</a>
+                <button type="submit" formaction="{% url 'generate_inventory_pdf' %}" formmethod="get" class="button is-danger mx-2">Generar Pdf</button>
+                <button type="submit" formaction="{% url 'generate_inventory_xls' %}" formmethod="get" class="button is-primary ml-2">Generar Excel</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+
+
+<!-- Resultados de la búsqueda -->
+<table class="table is-striped is-hoverable is-fullwidth">
+  <thead>
+  <tr>
+    <th>Cod.Barr.</th>
+    <th>Producto</th>
+    <th>Modelo</th>
+    <th>Marca</th>
+    <th>Número de Serie</th>
+    <th>Categoría</th>
+    <th>Cantidad</th>
+    <th>Ubicación</th>
+  </tr>
+  </thead>
+  <tbody>
+  {% for item in page_obj %}
+  <tr>
+    <td>{{ item.product.bar_code }}</td>
+    <td>{{ item.product.name }}</td>
+    <td>{{ item.product.model }}</td>
+    <td>{{ item.product.brand.name }}</td>
+    <td>{{ item.product.serial_number }}</td>
+    <td>{{ item.product.category.name }}</td>
+    <td>{{ item.quantity }}</td>
+    <td>{{ item.location.name }}</td>
+  </tr>
+  {% empty %}
+  <tr>
+    <td colspan="5">No se encontraron productos que coincidan con los filtros.</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<!-- Mostrar la suma total de las cantidades -->
+<div class="has-text-left mt-4 ml-3">
+    <strong>Total productos:</strong> {{ total_quantity }}
+</div>
+
+<!-- Controles de paginación -->
+<nav class="pagination is-centered" role="navigation" aria-label="pagination">
+    {% if page_obj.has_previous %}
+      <a class="pagination-previous" href="?page=1">Primera</a>
+      <a class="pagination-previous" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+    {% endif %}
+
+    {% if page_obj.has_next %}
+      <a class="pagination-next" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+      <a class="pagination-next" href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+    {% endif %}
+
+    <ul class="pagination-list">
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <li><a class="pagination-link is-current">{{ num }}</a></li>
+        {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+          <li><a class="pagination-link" href="?page={{ num }}">{{ num }}</a></li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+</nav>
+
+{% endblock %}

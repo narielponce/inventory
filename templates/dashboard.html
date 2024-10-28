@@ -1,0 +1,118 @@
+<!-- templates/dashboard.html -->
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h3 class="title is-3">Dashboard Inventario</h3>
+
+<div class="columns">
+
+    <!-- Gráfico de categorías -->
+    <div class="column">
+        <h3 class="title is-4">Productos por categoría</h3>
+        <div class="box fixed-box" style="position: relative">
+            <canvas id="categoryChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Gráfico de estados -->
+    <div class="column auto">
+        <h3 class="title is-4">Productos por Estado</h3>
+        <div class="box fixed-box" style="position: relative">
+            <canvas id="stateChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<!-- Incluir Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  // Obtener los datos de etiquetas y recuentos desde el contexto de Django
+  const labels = {{ labels|safe }};
+  const counts = {{ counts|safe }};
+
+  // Crear el gráfico de torta usando Chart.js
+  const ctx = document.getElementById('categoryChart').getContext('2d');
+  const categoryChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Inventario por Categoría',
+        data: counts,
+        backgroundColor: [
+          '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+        ],
+        hoverBackgroundColor: [
+          '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+        ]
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'right',
+        },
+        tooltip: {
+          callbacks: {
+            label: function(tooltipItem) {
+              return tooltipItem.label + ': ' + tooltipItem.raw;
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // Gráfico de Estados
+  const stateLabels = {{ state_labels|safe }};
+  const stateCounts = {{ state_counts|safe }};
+  const ctxState = document.getElementById('stateChart').getContext('2d');
+  const stateChart = new Chart(ctxState, {
+    type: 'pie',
+    data: {
+      labels: stateLabels,
+      datasets: [{
+        label: 'Inventario por Estado',
+        data: stateCounts,
+        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'],
+        hoverBackgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40']
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'right' },
+        tooltip: {
+          callbacks: {
+            label: function(tooltipItem) {
+              return tooltipItem.label + ': ' + tooltipItem.raw;
+            }
+          }
+        }
+      }
+    }
+  });
+</script>
+
+<!-- Estilos personalizados para asegurar el mismo tamaño de cajas y gráficos -->
+<style>
+.fixed-box {
+  max-width: 500px;      /* Ancho fijo para todas las cajas */
+  height: 400px;         /* Altura más compacta */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.fixed-box canvas {
+  max-height: 200px;     /* Limitar la altura del gráfico dentro de la caja */
+  max-width: 100%;       /* Asegura que el gráfico se ajuste al ancho de la caja */
+}
+</style>
+
+{% endblock %}

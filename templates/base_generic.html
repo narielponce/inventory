@@ -1,0 +1,24 @@
+<!-- templates/base_generic.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Inventory System{% endblock %}</title>
+    <!-- Incluir Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+</head>
+<body>
+    <!--<header>
+        <h1>Mi Aplicación de Inventario</h1>
+    </header>-->
+
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!--<footer>
+        <p>Copyright © 2024</p>
+    </footer>-->
+</body>
+</html>

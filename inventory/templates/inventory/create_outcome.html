@@ -1,0 +1,81 @@
+<!-- templates/inventory/create_outcome.html -->
+{% extends 'base_dashboard.html' %}
+
+{% load form_tags %}  <!-- Carga los filtros personalizados -->
+
+{% block title %}Egreso{% endblock %}
+
+{% block content %}
+  <h2 class="title is-4">Movimiento de Material entre ubicaciones</h2>
+
+  <!-- Formulario de búsqueda de producto en el inventario -->
+  <form method="get" action="{% url 'create_outcome' %}" class="box">
+    <div class="field">
+      <label class="label">Buscar Producto en Inventario</label>
+      <div class="control">
+        <input class="input" type="text" name="search_query" placeholder="Buscar por nombre, modelo o número de serie" value="{{ search_query }}">
+      </div>
+    </div>
+    <div class="control">
+      <button type="submit" class="button is-info">Buscar</button>
+    </div>
+  </form>
+
+  <!-- Mostrar resultados de la búsqueda -->
+  {% if inventory_items %}
+    <h5 class="title is-5">Resultados de la búsqueda:</h5>
+    <ul>
+      {% for item in inventory_items %}
+        <li>
+          <a href="?inventory_id={{ item.id }}">
+            -> {{ item.product.name }} ( {{ item.product.brand.name }} ) - Mod: {{ item.product.model }} - SN: {{ item.product.serial_number }} | Cant: {{ item.quantity }} | en: {{ item.location.name}}</a>
+        </li>
+      {% empty %}
+        <li>No se encontraron productos en inventario.</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <!-- Formulario de egreso -->
+  {% if selected_inventory %}
+    <!--<h5 class="title is-5">Producto seleccionado: {{ selected_inventory.product.name }} (Stock: {{ selected_inventory.quantity }} unidades)</h5>-->
+    <form method="post">
+      {% csrf_token %}
+      <div class="field">
+        <label class="label">Producto seleccionado</label>
+        <div class="control">
+          <!-- {{ form.product|add_class:"input" }} -->
+          <input
+            class="input"
+            type="text"
+            value="{{ selected_inventory.product.name }} ( {{ selected_inventory.product.brand.name}} ) - Mod: {{ selected_inventory.product.model}} - SN: {{ selected_inventory.product.serial_number}} | Cant: {{ selected_inventory.quantity }} | en: {{ selected_inventory.location.name}}" disabled>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Cantidad a retirar</label>
+        <div class="control">
+          {{ form.qty|add_class:"input" }}
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Ubicación de destino (Opcional)</label>
+        <div class="control">
+          {{ form.dest_location|add_class:"input" }}
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Comentario (Opcional)</label>
+        <div class="control">
+          {{ form.comment|add_class:"textarea" }}
+        </div>
+      </div>
+
+      <div class="control">
+        <button type="submit" class="button is-danger">Registrar Egreso</button>
+      </div>
+    </form>
+  {% endif %}
+{% endblock %}
