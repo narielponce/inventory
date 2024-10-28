@@ -1,0 +1,12 @@
+# Exported from Render on 2024-10-28T12:01:00Z
+databases:
+- name: inventory
+  databaseName: inventory_4ll8
+  user: inventory_4ll8_user
+  plan: free
+  region: oregon
+  ipAllowList:
+  - source: 0.0.0.0/0
+    description: everywhere
+  postgresMajorVersion: "16"
+version: "1"
