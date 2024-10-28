@@ -1,0 +1,17 @@
+# Archivos de entorno
+.env
+
+# Base de datos de desarrollo
+*.sqlite3
+
+# Archivos de migración
+**/migrations/
+
+# Entorno virtual
+venv/
+env/
+
+# Archivos de caché y configuraciones locales
+__pycache__/
+*.py[cod]
+.DS_Store
